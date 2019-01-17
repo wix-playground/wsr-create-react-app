@@ -1,5 +1,3 @@
-
-
 const fs = require('fs');
 const path = require('path');
 const webpack = require('webpack');
@@ -397,8 +395,6 @@ module.exports = function(webpackEnv) {
               use: getStyleLoaders({
                 importLoaders: 1,
                 sourceMap: isEnvProduction && shouldUseSourceMap,
-                camelCase: true,
-                localIdentName:'[name]__[local]___[hash:base64:5]',
               }),
               // Don't consider CSS imports dead code even if the
               // containing package claims to have no side effects.
@@ -423,15 +419,18 @@ module.exports = function(webpackEnv) {
             {
               test: sassRegex,
               include: [
-                path.join(__dirname, 'node_modules/wix-animations'),
-                path.join(__dirname, 'node_modules/wix-style-react'),
-                path.join(__dirname, 'node_modules/bootstrap-sass')
+                path.join(__dirname, '../node_modules/wix-animations'),
+                path.join(__dirname, '../node_modules/wix-style-react'),
+                path.join(__dirname, '../node_modules/bootstrap-sass')
               ],
               exclude: sassModuleRegex,
               use: getStyleLoaders(
                 {
-                  importLoaders: 2,
+                  modules: true,
+                  importLoaders: 1,
                   sourceMap: isEnvProduction && shouldUseSourceMap,
+                  camelCase: true,
+                  localIdentName:'[name]__[local]___[hash:base64:5]',
                 },
                 'sass-loader'
               ),
