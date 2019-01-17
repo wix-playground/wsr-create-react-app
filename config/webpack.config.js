@@ -36,6 +36,7 @@ const useTypeScript = fs.existsSync(paths.appTsConfig);
 
 // style files regexes
 const cssRegex = /\.css$/;
+const stCssRegex = /\.st\.css$/;
 const cssModuleRegex = /\.module\.css$/;
 const sassRegex = /\.(scss|sass)$/;
 const sassModuleRegex = /\.module\.(scss|sass)$/;
@@ -309,6 +310,7 @@ module.exports = function(webpackEnv) {
           include: paths.appSrc,
         },
         {
+          exclude: stCssRegex,
           // "oneOf" will traverse all following loaders until one will
           // match the requirements. When no loader matches it will fall
           // back to the "file" loader at the end of the loader list.
@@ -484,13 +486,6 @@ module.exports = function(webpackEnv) {
             }
           ]
         },
-        {
-          test: /(?<!\.st)\.css$/,
-          loaders: [
-            'style-loader',
-            'css-loader'
-          ]
-        }
       ],
     },
     plugins: [
@@ -618,7 +613,10 @@ module.exports = function(webpackEnv) {
           silent: true,
           formatter: typescriptFormatter,
         }),
-        new StylableWebpackPlugin(),
+        new StylableWebpackPlugin({
+          experimentalHMR: true,
+          useEntryModuleInjection: true
+        }),
     ].filter(Boolean),
     // Some libraries import Node modules but don't use them in the browser.
     // Tell Webpack to provide empty mocks for them so importing them works.
