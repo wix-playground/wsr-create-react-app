@@ -1,4 +1,4 @@
-'use strict';
+
 
 const fs = require('fs');
 const path = require('path');
@@ -23,7 +23,7 @@ const getClientEnvironment = require('./env');
 const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin-alt');
 const typescriptFormatter = require('react-dev-utils/typescriptFormatter');
-
+const StylableWebpackPlugin = require('@stylable/webpack-plugin');
 
 // Source maps are resource heavy and can cause out of memory issue for large source files.
 const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== 'false';
@@ -395,6 +395,8 @@ module.exports = function(webpackEnv) {
               use: getStyleLoaders({
                 importLoaders: 1,
                 sourceMap: isEnvProduction && shouldUseSourceMap,
+                camelCase: true,
+                localIdentName:'[name]__[local]___[hash:base64:5]',
               }),
               // Don't consider CSS imports dead code even if the
               // containing package claims to have no side effects.
@@ -418,6 +420,11 @@ module.exports = function(webpackEnv) {
             // extensions .module.scss or .module.sass
             {
               test: sassRegex,
+              include: [
+                path.join(__dirname, 'node_modules/wix-animations'),
+                path.join(__dirname, 'node_modules/wix-style-react'),
+                path.join(__dirname, 'node_modules/bootstrap-sass')
+              ],
               exclude: sassModuleRegex,
               use: getStyleLoaders(
                 {
@@ -466,6 +473,24 @@ module.exports = function(webpackEnv) {
             // Make sure to add the new loader(s) before the "file" loader.
           ],
         },
+        {
+          test: /\.(png|jpg|gif)$/,
+          use: [
+            {
+              loader: 'url-loader',
+              options: {
+                limit: 8192
+              }
+            }
+          ]
+        },
+        {
+          test: /(?<!\.st)\.css$/,
+          loaders: [
+            'style-loader',
+            'css-loader'
+          ]
+        }
       ],
     },
     plugins: [
@@ -593,6 +618,7 @@ module.exports = function(webpackEnv) {
           silent: true,
           formatter: typescriptFormatter,
         }),
+        new StylableWebpackPlugin(),
     ].filter(Boolean),
     // Some libraries import Node modules but don't use them in the browser.
     // Tell Webpack to provide empty mocks for them so importing them works.
